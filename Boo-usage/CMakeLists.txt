@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0025 OLD) # Clang, AppleClang
 project(Boo)
 
+set(CMAKE_VERBOSE_MAKEFILE YES CACHE BOOL "" FORCE)
+
 find_package(Foo CONFIG REQUIRED)
 
 add_executable(boo boo.cpp)
