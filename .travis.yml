@@ -17,3 +17,21 @@ script:
     - export PATH=/usr/local/bin:${PATH}
     - which cmake
     - cmake --version
+    # Foo package install
+    - cmake -HFoo-package -B_builds/Foo-debug -DCMAKE_BUILD_TYPE=Debug "${GENERATOR}" "-DCMAKE_TOOLCHAIN_FILE=`pwd`/toolchains/${TOOLCHAIN}.cmake" "-DCMAKE_INSTALL_PREFIX=`pwd`/_install"
+    - cmake --build _builds/Foo-debug --target install --config Debug -- ${EXTRA}
+    - cmake -HFoo-package -B_builds/Foo-release -DCMAKE_BUILD_TYPE=Release "${GENERATOR}" "-DCMAKE_TOOLCHAIN_FILE=`pwd`/toolchains/${TOOLCHAIN}.cmake" "-DCMAKE_INSTALL_PREFIX=`pwd`/_install"
+    - cmake --build _builds/Foo-release --target install --config Release -- ${EXTRA}
+    # -- end
+    # Boo (usage Foo installed package)
+    - cmake -HBoo-usage -B_builds/Boo-debug -DCMAKE_BUILD_TYPE=Debug "${GENERATOR}" "-DCMAKE_TOOLCHAIN_FILE=`pwd`/toolchains/${TOOLCHAIN}.cmake" "-DCMAKE_INSTALL_PREFIX=`pwd`/_install"
+    - cmake --build _builds/Boo-debug --config Debug -- ${EXTRA}
+    - cmake -HBoo-usage -B_builds/Boo-release -DCMAKE_BUILD_TYPE=Release "${GENERATOR}" "-DCMAKE_TOOLCHAIN_FILE=`pwd`/toolchains/${TOOLCHAIN}.cmake" "-DCMAKE_INSTALL_PREFIX=`pwd`/_install"
+    - cmake --build _builds/Boo-release --config Release -- ${EXTRA}
+    # -- end
+    - cd _builds/Boo-debug
+    - if [ "${RUN}" == "1" ]; then ctest -VV -C Debug; fi;
+    - cd ../..
+    - cd _builds/Boo-release
+    - if [ "${RUN}" == "1" ]; then ctest -VV -C Release; fi;
+    - cd ../..
