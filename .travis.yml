@@ -1,0 +1,19 @@
+language:
+    - cpp
+
+env:
+    - GENERATOR="-GUnix Makefiles" TOOLCHAIN=empty RUN=1
+
+install:
+    - sudo apt-get install cmake
+    - sudo apt-get install libcurl3-dev
+    - wget https://github.com/ruslo/CMake/archive/ios.universal.tar.gz
+    - tar xf ios.universal.tar.gz
+    - cmake -HCMake-ios.universal -B_builds/cmake -DCMAKE_USE_SYSTEM_CURL=YES -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build _builds/cmake
+    - sudo cmake --build _builds/cmake --target install
+
+script:
+    - export PATH=/usr/local/bin:${PATH}
+    - which cmake
+    - cmake --version
