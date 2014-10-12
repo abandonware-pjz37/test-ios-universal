@@ -7,15 +7,19 @@ env:
 install:
     - sudo apt-get install cmake
     - sudo apt-get install libcurl3-dev
-    - wget https://github.com/ruslo/CMake/archive/ios.universal.tar.gz
-    - openssl sha1 ios.universal.tar.gz
-    - tar xf ios.universal.tar.gz
-    - cmake -HCMake-ios.universal -B_builds/cmake -DCMAKE_USE_SYSTEM_CURL=YES -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build _builds/cmake
-    - sudo cmake --build _builds/cmake --target install
+    # install cmake
+    - CMAKE_VERSION="3.0.2-ios-universal"
+    - wget "https://github.com/ruslo/CMake/archive/v${CMAKE_VERSION}.tar.gz"
+    - openssl sha1 "v${CMAKE_VERSION}.tar.gz"
+    - tar xf "v${CMAKE_VERSION}.tar.gz"
+    - cd "CMake-${CMAKE_VERSION}"
+    - cmake -H. -B_builds -DCMAKE_INSTALL_PREFIX="`pwd`/_install/" -DCMAKE_BUILD_TYPE=Release -DCMAKE_USE_SYSTEM_CURL=YES
+    - cmake --build _builds --target install
+    - export PATH="`pwd`/_install/bin:${PATH}"
+    - cd ..
+    # -- end
 
 script:
-    - export PATH=/usr/local/bin:${PATH}
     - which cmake
     - cmake --version
     # Foo package install
@@ -30,9 +34,11 @@ script:
     - cmake -HBoo-usage -B_builds/Boo-release -DCMAKE_BUILD_TYPE=Release "${GENERATOR}" "-DCMAKE_TOOLCHAIN_FILE=`pwd`/toolchains/${TOOLCHAIN}.cmake" "-DCMAKE_INSTALL_PREFIX=`pwd`/_install"
     - cmake --build _builds/Boo-release --config Release -- ${EXTRA}
     # -- end
+    # Run test
     - cd _builds/Boo-debug
     - if [ "${RUN}" == "1" ]; then ctest -VV -C Debug; fi;
     - cd ../..
     - cd _builds/Boo-release
     - if [ "${RUN}" == "1" ]; then ctest -VV -C Release; fi;
     - cd ../..
+    # -- end
