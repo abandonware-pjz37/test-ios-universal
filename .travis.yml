@@ -7,14 +7,19 @@ env:
     - GENERATOR="-GUnix Makefiles" TOOLCHAIN=empty RUN=1
 
 install:
-    - wget https://github.com/ruslo/CMake/archive/ios.universal.tar.gz
-    - openssl sha1 ios.universal.tar.gz
-    - tar xf ios.universal.tar.gz
-    - cmake -HCMake-ios.universal -B_builds/cmake -DCMAKE_USE_SYSTEM_CURL=YES -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build _builds/cmake --target install
+    # install cmake
+    - CMAKE_VERSION="3.0.2-ios-universal"
+    - wget "https://github.com/ruslo/CMake/archive/v${CMAKE_VERSION}.tar.gz"
+    - openssl sha1 "v${CMAKE_VERSION}.tar.gz"
+    - tar xf "v${CMAKE_VERSION}.tar.gz"
+    - cd "CMake-${CMAKE_VERSION}"
+    - cmake -H. -B_builds -DCMAKE_INSTALL_PREFIX="`pwd`/_install/" -DCMAKE_BUILD_TYPE=Release -DCMAKE_USE_SYSTEM_CURL=YES
+    - cmake --build _builds --target install
+    - export PATH="`pwd`/_install/bin:${PATH}"
+    - cd ..
+    # -- end
 
 script:
-    - export PATH=/usr/local/bin:${PATH}
     - which cmake
     - cmake --version
     # Foo package install
